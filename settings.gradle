@@ -1,0 +1,3 @@
+rootProject.name = 'springboot-proguard-example'
+
+include 'proguard-example-config'

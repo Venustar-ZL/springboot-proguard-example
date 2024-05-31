@@ -1,0 +1,77 @@
+import proguard.gradle.ProGuardTask
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.4.2")
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+
+bootJar {
+    enabled = false
+}
+
+ext {
+    civersion = System.getProperty("ci-version") ?: "${project.version}"
+    maven_username = 'admin'
+    maven_password = 'password'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.register('proguard', ProGuardTask) {
+    configuration file('proguard.pro')
+
+    injars(tasks.named('jar').flatMap { it.archiveFile })
+
+    def javaHome = System.getProperty('java.home')
+    if (System.getProperty('java.version').startsWith('1.')) {
+        libraryjars "${javaHome}/lib/rt.jar"
+    } else {
+        libraryjars "${javaHome}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    }
+
+    verbose()
+
+    def baseCoordinates = "${project.group}.${project.name}.${project.version}".replace(':', '_')
+    outjars layout.buildDirectory.file("libs/${project.name}-minified.jar")
+}
+
+tasks.named('jar') {
+    dependsOn 'classes'
+}
+
+publishing {
+    repositories {
+        maven {
+            allowInsecureProtocol = true
+            credentials {
+                username "${maven_username}"
+                password "${maven_password}"
+            }
+            url 'http://xxxx:xxxx/repository/maven-releases/'
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+
+            artifact("$buildDir/libs/${project.name}-minified.jar") {
+                builtBy proguard
+            }
+
+            groupId = "${project.group}"
+            artifactId = "${project.archivesBaseName}"
+            version = "0.0.1"
+        }
+    }
+}
