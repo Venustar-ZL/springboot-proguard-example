@@ -1,3 +1,8 @@
 tasks.bootJar {
     enabled = false
 }
+
+dependencies {
+    implementation 'io.minio:minio:8.5.7'
+
+}
