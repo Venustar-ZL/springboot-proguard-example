@@ -43,12 +43,7 @@ tasks.register('proguard', ProGuardTask) {
 
     verbose()
 
-    def baseCoordinates = "${project.group}.${project.name}.${project.version}".replace(':', '_')
     outjars layout.buildDirectory.file("libs/${project.name}-minified.jar")
-}
-
-tasks.named('jar') {
-    dependsOn 'classes'
 }
 
 publishing {
