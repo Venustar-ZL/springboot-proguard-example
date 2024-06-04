@@ -23,22 +23,12 @@ public class MinIOUtil {
         return this.minIOProperties.getEndpoint();
     }
 
-    /**
-     * 检查存储桶是否存在.
-     *
-     * @param bucketName 存储桶名称
-     */
     @SneakyThrows
     public boolean bucketExists(String bucketName) {
         BucketExistsArgs args = BucketExistsArgs.builder().bucket(bucketName).build();
         return minIOClient.bucketExists(args);
     }
 
-    /**
-     * 创建存储桶.
-     *
-     * @param bucketName 存储桶名称
-     */
     @SneakyThrows
     public void makeBucket(String bucketName) {
         if (!bucketExists(bucketName)) {
